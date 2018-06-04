@@ -3,7 +3,7 @@ import {VOTE_POST,SET_INITIAL_POSTS,DELETE_POST,EDIT_POST,ADD_POST,SORT,FETCH_CO
 
 function post(state = [],action){  
   switch(action.type){      
-    case SET_INITIAL_POSTS:{      
+    case SET_INITIAL_POSTS:{       
       if(action.payload)
       	return action.payload
       else
@@ -85,6 +85,7 @@ function post(state = [],action){
       let newState =  state.map(post=>{
         if(post.id === action.pid){
           	post.comments.push((newComment));
+            post.countScore += 1;
           	return post;
         }
         else
@@ -112,7 +113,7 @@ function post(state = [],action){
     case DELETE_COMMENT:{     
     	return state.map((post)=>{
           if(post.comments)
-          	return {...post,comments:post.comments.filter((comment)=>comment.id !== action.cid)}
+          	return {...post,comments:post.comments.filter((comment)=>comment.id !== action.cid),countScore :post.countScore -= 1}
           else
             return post;
         });

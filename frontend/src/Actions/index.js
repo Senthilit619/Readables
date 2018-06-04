@@ -10,10 +10,9 @@ export const FETCH_COMMENTS = 'FETCH_COMMENTS'
 export const DELETE_POST = 'DELETE_POST'
 export const DELETE_COMMENT = 'DELETE_COMMENT'
 
-export function setInitialPosts(posts){
+export function setInitialPosts(){   
   return {
-    type: SET_INITIAL_POSTS,
-    payload:posts
+    type: SET_INITIAL_POSTS
   }
 }
 export function addPost(title,body,author,category){  
@@ -49,7 +48,8 @@ export function sort(attr){
     attr
   }
 }
-export function fetchComments(id){    
+export function fetchComments(id){
+  console.log(id);    
   return {
     type: FETCH_COMMENTS,
     id

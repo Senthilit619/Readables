@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
-
 class Post extends Component{
 	constructor(props){
       super(props);
@@ -12,13 +11,16 @@ class Post extends Component{
   componentDidMount(){ 
   }
   
-  render(){   
+  render(){
+    let post = this.props.posts.filter((post)=>(post.id === this.props.id))[0];
+    if(post.countScore !== undefined)
+    console.log(post);
     var date = new Date(this.props.timestamp);
   	date = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
     return(
     	<div className="well well-lg post">
     		<Link to={`/${this.props.category}/${this.props.id}`}>
-    			<h4 onClick={()=>this.props.fetchComments(this.props.id)}>{this.props.title}</h4>
+    			<h4>{this.props.title}</h4>
     		</Link>
     		<h5 className="post-body">{this.props.body}</h5>
         <Link to={`/create/${this.props.id}/${this.props.title}/${this.props.body}`}> 
@@ -33,19 +35,18 @@ class Post extends Component{
   		    <span>Category:</span><span>{this.props.category}</span> |
           <span>Time:</span><span>{date}</span> |
           <span>Votes:</span><span>{this.props.voteScore}</span> |
-          <span>Deleted:</span><span>{String(this.props.deleted)}</span>
+          <span>Deleted:</span><span>{String(this.props.deleted)}</span> | 
+          <span>Comments:</span><span>{post.countScore}</span>
         </div>			            
       </div>
     )    
   };
 }
-function mapStateToProps(state){
-	return{	
-		}
-}
-function mapDispatchToProps(dispatch){
-	return{	
-	}
-}
 
-export default connect(mapStateToProps,mapDispatchToProps)(Post);
+function mapStateToProps(state){
+  console.log(state);
+  return {
+    posts:state.posts
+  }
+}
+export default connect(mapStateToProps)(Post);

@@ -1,6 +1,5 @@
 import React,{Component} from 'react';
 import {Link} from 'react-router-dom'
-import {Route} from 'react-router-dom'
 
 const API = "http://localhost:3001";
 

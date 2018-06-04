@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter,Route} from 'react-router-dom'
+import { BrowserRouter,Route, Switch} from 'react-router-dom'
 import './index.css';
 import App from './Components/App';
 import registerServiceWorker from './registerServiceWorker';
@@ -11,26 +11,32 @@ import reducer from './Reducers'
 import Category from './Components/Category';
 import PostDetail from './Components/PostDetail';
 import Create from './Components/Create';
+import axios from 'axios';
 
 const API = "http://localhost:3001";
 const fetchComments = store => next => action => {  
   	switch(action.type){
       case 'SET_INITIAL_POSTS':{
-        let url = `${API}/posts`;    
-          fetch(url, { headers: { 'Authorization': 'whatever-you-want'},
-                     method:'GET'} )
-        .then( (res) => { return(res.text()) })
-        .then((data) => {           
-            console.log(data); 
-          	let temp = JSON.parse(data);
-            action.payload = temp;
-            console.log("Middleware triggered:", action);            
-            if(action.payload !== undefined){              	
-            	next(action);
-            } 
-      	})
+        axios.get(`${API}/posts`,{ headers: { 'Authorization': 'whatever-you-want'}}) // Get user details
+        .then(response => {          
+          let posts = response.data;
+          posts.map((post)=>{
+            axios.get(`${API}/posts/${post.id}/comments`,{ headers: { 'Authorization': 'whatever-you-want'}})
+            .then(response => {               
+               post.countScore = response.data.length;               
+               return post;
+            })
+            return post;
+          })        
+          action.payload = posts;
+          console.log("Middleware triggered:", action);            
+          if(action.payload !== undefined){                
+            next(action);
+          } 
+          return;
+        })
         break;
-      }      
+      }          
       case 'ADD_POST':{
       let alpha = Math.floor(Math.random() * (122 - 97 + 1) ) + 97;
       alpha = String.fromCharCode(alpha);
@@ -87,6 +93,7 @@ const fetchComments = store => next => action => {
         break;
       }
       case 'FETCH_COMMENTS':{      
+        console.log(action);
         let url = `${API}/posts/${action.id}/comments`;    
         fetch(url, { headers: { 'Authorization': 'whatever-you-want',
                                 'Content-Type': 'application/json'},
@@ -174,10 +181,13 @@ const store = createStore(reducer,applyMiddleware(fetchComments));
 ReactDOM.render(<Provider store={store}>
                 	<BrowserRouter>
                       <div>
-                        <Route path="/" exact component={App} />   
-                        <Route path="/:cName" exact component={Category}/>   
-                        <Route path="/:category/:id" exact component={PostDetail}/>
-                        <Route path="/create/:pid?/:title?/:body?" exact component={Create}/>                        
+                        <Switch>
+                          <Route path="/" exact component={App} />   
+                          <Route path="/create/:pid?/:title?/:body?" exact component={Create}/>
+                          <Route path="/:cName" exact component={Category}/>   
+                          <Route path="/:category/:id" exact component={PostDetail}/>
+                                                  
+                        </Switch>
                       </div>
                 	</BrowserRouter>                
                 </Provider>, document.getElementById('root'));

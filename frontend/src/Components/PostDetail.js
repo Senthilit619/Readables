@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {votePost,deletePost,voteComment,deleteComment,addComment,editComment} from '../Actions';
+import {votePost,deletePost,voteComment,deleteComment,addComment,editComment,fetchComments} from '../Actions';
 import Modal from'react-modal';
 import EmptyMessage from './EmptyMessage';
 import CategoryList from './CategoryList';
@@ -34,19 +34,23 @@ openModal = (action,cid,body) => {
   this.setState(() => ({ modalOpen: true,action:action,body:body,cid:cid})) 
 }
 closeModal = () => this.setState(() => ({ modalOpen: false,action:'null' }))
+
+componentWillMount(){  
+  this.props.fetchComments(this.props.match.params.id);
+}
 componentDidMount(){   
-  Modal.setAppElement('#postdetails');
+  Modal.setAppElement('#postdetails');  
 }  
-deleteComment = (id)=>{    
-  	let url = `${process.env.REACT_APP_BACKEND}/comments/${id}`;
-  	if(id!== undefined)
-      fetch(url, { headers: { 'Authorization': 'whatever-you-want' },
-                   credentials: 'include',
-                   method:'DELETE' } )
-        .then((res) => { return(res.text()) })
-        .then((data) => {      
-      });  
-  }
+// deleteComment = (id)=>{    
+//   	let url = `${process.env.REACT_APP_BACKEND}/comments/${id}`;
+//   	if(id!== undefined)
+//       fetch(url, { headers: { 'Authorization': 'whatever-you-want' },
+//                    credentials: 'include',
+//                    method:'DELETE' } )
+//         .then((res) => { return(res.text()) })
+//         .then((data) => {      
+//       });  
+//   }
   render(){    
     var comments;
     let postDetails = this.props.posts.filter((post)=>post.id === this.props.match.params.id)[0];
@@ -55,13 +59,13 @@ deleteComment = (id)=>{
       date = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
   		if(postDetails.comments){
       		comments = postDetails.comments
-  		}
+  		}      
 	  }
-    console.log(postDetails);
+    
   return(
   	<div id="postdetails">
     <CategoryList/>
-    	{postDetails !== undefined &&
+    	{postDetails !== undefined && 
     	<div className="well well-lg post">
       		<h4 className="post-title">{postDetails.title}</h4>
     		<h5 className="post-body">{postDetails.body}</h5>    		      			            
@@ -139,7 +143,8 @@ function mapDispatchToProps(dispatch){
 		voteComment:(option,pid,cid)=>dispatch(voteComment(option,pid,cid)),
 		deleteComment:(pid,cid)=>dispatch(deleteComment(pid,cid)),
 		addComment:(pid,body,author)=>dispatch(addComment(pid,body,author)),
-		editComment:(cid,body)=>dispatch(editComment(cid,body))
+		editComment:(cid,body)=>dispatch(editComment(cid,body)),
+    fetchComments:(id)=>dispatch(fetchComments(id))
  	}
 }
 export default connect(mapStateToProps,mapDispatchToProps)(PostDetail);
