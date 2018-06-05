@@ -9,15 +9,14 @@ class Post extends Component{
     }  
  
   componentDidMount(){ 
+    this.props.fetchComments(this.props.id);
   }
   
   render(){
-    let post = this.props.posts.filter((post)=>(post.id === this.props.id))[0];
-    if(post.countScore !== undefined)
-    console.log(post);
+    let post = this.props.posts.filter((post)=>(post.id === this.props.id))[0];        
     var date = new Date(this.props.timestamp);
   	date = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
-    return(
+    return( !post.deleted && 
     	<div className="well well-lg post">
     		<Link to={`/${this.props.category}/${this.props.id}`}>
     			<h4>{this.props.title}</h4>
@@ -36,15 +35,14 @@ class Post extends Component{
           <span>Time:</span><span>{date}</span> |
           <span>Votes:</span><span>{this.props.voteScore}</span> |
           <span>Deleted:</span><span>{String(this.props.deleted)}</span> | 
-          <span>Comments:</span><span>{post.countScore}</span>
+          <span>Comments:</span><span>{post.comments && post.comments.length}</span>
         </div>			            
       </div>
     )    
   };
 }
 
-function mapStateToProps(state){
-  console.log(state);
+function mapStateToProps(state){  
   return {
     posts:state.posts
   }

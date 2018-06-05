@@ -48,8 +48,7 @@ export function sort(attr){
     attr
   }
 }
-export function fetchComments(id){
-  console.log(id);    
+export function fetchComments(id){    
   return {
     type: FETCH_COMMENTS,
     id

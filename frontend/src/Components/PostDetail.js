@@ -41,16 +41,6 @@ componentWillMount(){
 componentDidMount(){   
   Modal.setAppElement('#postdetails');  
 }  
-// deleteComment = (id)=>{    
-//   	let url = `${process.env.REACT_APP_BACKEND}/comments/${id}`;
-//   	if(id!== undefined)
-//       fetch(url, { headers: { 'Authorization': 'whatever-you-want' },
-//                    credentials: 'include',
-//                    method:'DELETE' } )
-//         .then((res) => { return(res.text()) })
-//         .then((data) => {      
-//       });  
-//   }
   render(){    
     var comments;
     let postDetails = this.props.posts.filter((post)=>post.id === this.props.match.params.id)[0];
@@ -65,7 +55,7 @@ componentDidMount(){
   return(
   	<div id="postdetails">
     <CategoryList/>
-    	{postDetails !== undefined && 
+    	{(postDetails !== undefined && !postDetails.deleted) && 
     	<div className="well well-lg post">
       		<h4 className="post-title">{postDetails.title}</h4>
     		<h5 className="post-body">{postDetails.body}</h5>    		      			            
@@ -110,7 +100,7 @@ componentDidMount(){
             </ul>
         </div>
 		}
-    {postDetails === undefined && <EmptyMessage/>}
+    {(postDetails === undefined || postDetails.deleted) && <EmptyMessage/>}
 		<Modal isOpen={this.state.modalOpen} onRequestClose={this.closeModal} ariaHideApp={false}>
 		<form className="commentForm" id="commentForm">
             <div className="form-group">

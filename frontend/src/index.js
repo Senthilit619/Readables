@@ -17,58 +17,52 @@ const API = "http://localhost:3001";
 const fetchComments = store => next => action => {  
   	switch(action.type){
       case 'SET_INITIAL_POSTS':{
-        axios.get(`${API}/posts`,{ headers: { 'Authorization': 'whatever-you-want'}}) // Get user details
-        .then(response => {          
-          let posts = response.data;
-          posts.map((post)=>{
-            axios.get(`${API}/posts/${post.id}/comments`,{ headers: { 'Authorization': 'whatever-you-want'}})
-            .then(response => {               
-               post.countScore = response.data.length;               
-               return post;
-            })
-            return post;
-          })        
-          action.payload = posts;
-          console.log("Middleware triggered:", action);            
-          if(action.payload !== undefined){                
-            next(action);
-          } 
-          return;
-        })
+        let url = `${API}/posts/`;    
+        fetch(url, { headers: { 'Authorization': 'whatever-you-want',
+                                'Content-Type': 'application/json'},
+                     method: 'GET', 
+                     }) 
+          .then( (res) => { return(res.text()) })
+          .then((data) => {                
+              action.payload = JSON.parse(data);
+              console.log("Middleware triggered:", action);            
+              if(action.payload !== undefined){                
+                next(action);
+              }  
+        });    
         break;
       }          
       case 'ADD_POST':{
-      let alpha = Math.floor(Math.random() * (122 - 97 + 1) ) + 97;
-      alpha = String.fromCharCode(alpha);
-      let id = Math.trunc(Date.now()+Math.random())+alpha;  
-      console.log(id);
-      let url = `${API}/posts/`;    
+        let alpha = Math.floor(Math.random() * (122 - 97 + 1) ) + 97;
+        alpha = String.fromCharCode(alpha);
+        let id = Math.trunc(Date.now()+Math.random())+alpha;  
+        console.log(id);
+        let url = `${API}/posts/`;    
+          fetch(url, { headers: { 'Authorization': 'whatever-you-want',
+                                  'Content-Type': 'application/json'},
+                       method: 'POST', 
+                       body: JSON.stringify({id:id,timestamp:Date.now(),title:action.title,body:action.body,author:action.author,category:action.category})}) 
+            .then( (res) => { return(res.text()) })
+            .then((data) => {  
+            		console.log("Middleware triggered:", action);       
+                	next(action);
+          }); 
+          break;
+      }
+      case 'EDIT_POST':{
+        let url = `${API}/posts/${action.id}`;    
         fetch(url, { headers: { 'Authorization': 'whatever-you-want',
                                 'Content-Type': 'application/json'},
-                     method: 'POST', 
-                     body: JSON.stringify({id:id,timestamp:Date.now(),title:action.title,body:action.body,author:action.author,category:action.category})}) 
+                     method: 'PUT', 
+                     body: JSON.stringify({title:action.title,body:action.body})}) 
           .then( (res) => { return(res.text()) })
-          .then((data) => {  
-          		console.log("Middleware triggered:", action);       
-              	next(action);
+          .then((data) => { 
+          		console.log("Middleware triggered:", action);          		
+                	next(action);
         }); 
         break;
       }
-      case 'EDIT_POST':{
-      let url = `${API}/posts/${action.id}`;    
-      fetch(url, { headers: { 'Authorization': 'whatever-you-want',
-                              'Content-Type': 'application/json'},
-                   method: 'PUT', 
-                   body: JSON.stringify({title:action.title,body:action.body})}) 
-        .then( (res) => { return(res.text()) })
-        .then((data) => { 
-        		console.log("Middleware triggered:", action);          		
-              	next(action);
-      }); 
-      break;
-      }
-      case 'DELETE_POST':{
-        console.log("deleting");
+      case 'DELETE_POST':{        
         let url = `${API}/posts/${action.id}`;     
         fetch(url, { headers: { 'Authorization': 'whatever-you-want' },
                     method:'DELETE' } )

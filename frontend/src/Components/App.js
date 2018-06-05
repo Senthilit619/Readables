@@ -16,8 +16,7 @@ class App extends Component {
       this.props.setInitialPosts();     
   }
   render() {	  
-      let posts = this.props.posts;
-      
+      let posts = this.props.posts;           
     return (
       <div className="App">      
       <div>
@@ -28,11 +27,12 @@ class App extends Component {
     			<option value="timestamp">Time</option> 
     		</select>	
         {posts.map((c)=>(                  
-        <Post key={c.id} id={c.id} post={c} title={c.title} author={c.author} 
+        <Post key={c.id} id={c.id} title={c.title} author={c.author} 
               deleted={c.deleted} timestamp={c.timestamp} body={c.body} voteScore={c.voteScore}              
-              category={c.category} countScore={c.countScore}
+              category={c.category} 
               onVote={(option,id)=>{this.props.vote(option,id)}}               
-              onDelete={(id)=>{this.props.deletePost(id)}} >
+              onDelete={(id)=>{this.props.deletePost(id)}}
+              fetchComments={(id)=>{this.props.fetchComments(id)}} >
     	  </Post>        
         ))}
 		    <Link to="/create">
